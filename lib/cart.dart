@@ -8,8 +8,17 @@ class Cart extends StatefulWidget {
 class _CartState extends State<Cart> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.green,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: Text("cart"),
+        elevation: 0,
+        backgroundColor: const Color(0x1b5e20).withOpacity(0.8),
+      ),
+      body: Center(
+
+
+      ),
     );
   }
 }

@@ -1,55 +1,65 @@
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 
-class QRCodeReader {
-  static const MethodChannel _channel = const MethodChannel('qrCodeReader');
+class QrScanner extends StatefulWidget {
+  @override
+  QrScannerState createState() {
+    return new QrScannerState();
+  }
+}
 
-  int _autoFocusIntervalInMs = 5000;
-  bool _forceAutoFocus = false;
-  bool _torchEnabled = false;
-  bool _handlePermissions = true;
-  bool _executeAfterPermissionGranted = true;
-  bool _frontCamera = false;
+class QrScannerState extends State<QrScanner> {
+  String result = "-scan QR or Bar code-";
 
-  QRCodeReader setAutoFocusIntervalInMs(int autoFocusIntervalInMs) {
-    _autoFocusIntervalInMs = autoFocusIntervalInMs;
-    return this;
+  Future _scanQR() async {
+    try {
+      String qrResult = await BarcodeScanner.scan();
+      setState(() {
+        result = qrResult;
+      });
+    } on PlatformException catch (ex) {
+      if (ex.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          result = "Camera permission was denied";
+        });
+      } else {
+        setState(() {
+          result = "Unknown Error $ex";
+        });
+      }
+    } on FormatException {
+      setState(() {
+        result = "Back button pressed before scanning";
+      });
+    } catch (ex) {
+      setState(() {
+        result = "Unknown Error $ex";
+      });
+    }
   }
 
-  QRCodeReader setForceAutoFocus(bool forceAutoFocus) {
-    _forceAutoFocus = forceAutoFocus;
-    return this;
-  }
-
-  QRCodeReader setTorchEnabled(bool torchEnabled) {
-    _torchEnabled = torchEnabled;
-    return this;
-  }
-
-  QRCodeReader setHandlePermissions(bool handlePermissions) {
-    _handlePermissions = handlePermissions;
-    return this;
-  }
-
-  QRCodeReader setExecuteAfterPermissionGranted(bool executeAfterPermissionGranted) {
-    _executeAfterPermissionGranted = executeAfterPermissionGranted;
-    return this;
-  }
-
-  QRCodeReader setFrontCamera(bool setFrontCamera) {
-    _frontCamera = setFrontCamera;
-    return this;
-  }
-
-  Future<String> scan() async {
-    Map params = <String, dynamic>{
-      "autoFocusIntervalInMs": _autoFocusIntervalInMs,
-      "forceAutoFocus": _forceAutoFocus,
-      "torchEnabled": _torchEnabled,
-      "handlePermissions": _handlePermissions,
-      "executeAfterPermissionGranted": _executeAfterPermissionGranted,
-      "frontCamera": _frontCamera,
-    };
-    return await _channel.invokeMethod('readQRCode', params);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Scanner"),
+        backgroundColor: Colors.black,
+      ),
+      body: Center(
+        child: Text(
+          result,
+          style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: Icon(Icons.camera_alt),
+        label: Text("Scan bottle"),
+        onPressed: _scanQR,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
   }
 }
