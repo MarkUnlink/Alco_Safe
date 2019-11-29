@@ -1,10 +1,7 @@
 import 'package:alco_safe/home.dart';
 import 'package:flutter/material.dart';
 
-import 'package:alco_safe/home.dart';
 import 'package:alco_safe/register.dart';
-import 'package:flutter/material.dart' as prefix0;
-import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,16 +52,15 @@ class _LoginState extends State<LoginPage> {
     //String message = response.toString();
 
     if (response.body == 'success') {
-      print(message);
-      //loginToast(message);
-      savePref(value, username);
-      //Navigator.of(ctx).popAndPushNamed("/home");
-      Navigator.of(ctx).pushReplacementNamed("/home");
-
       setState(() {
         _loginStatus = LoginStatus.signedIn;
         value = 1;
       });
+
+      print(message);
+      loginToast(message);
+      savePref(value, username);
+      Navigator.of(ctx).pushReplacementNamed("/home");
 
     } else if (response.body == "invalid"){
       print(message);
@@ -78,7 +74,7 @@ class _LoginState extends State<LoginPage> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIos: 1,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.red[900],
         textColor: Colors.white);
   }
 
@@ -97,7 +93,6 @@ class _LoginState extends State<LoginPage> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       value = preferences.getInt("value");
-
       _loginStatus = value == 1 ? LoginStatus.signedIn : LoginStatus.signedOut;
     });
   }
@@ -115,7 +110,7 @@ class _LoginState extends State<LoginPage> {
     switch (_loginStatus) {
       case LoginStatus.signedOut:
         return Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.white,
           body: Center(
             child: ListView(
               shrinkWrap: true,
@@ -125,24 +120,32 @@ class _LoginState extends State<LoginPage> {
                   child: Container(
                     padding: const EdgeInsets.all(8.0),
 //            color: Colors.grey.withAlpha(20),
-                    color: Colors.black,
+                    color: Colors.white,
                     child: Form(
                       key: _key,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Image.asset('assets/images/qr-code.png',
-                            height: 190,
-                            width: 190,),
+                          Image.asset('assets/images/logo.png',
+                            height: 200,
+                            width: 200,),
                           SizedBox(
-                            height: 40,
+                            height: 20,
+                            child: Text(
+                              "alcohol verification app",
+                              style: TextStyle(
+                                  color: Colors.blue[900], fontSize: 16.0),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
                           ),
                           SizedBox(
                             height: 50,
                             child: Text(
                               "Login",
                               style: TextStyle(
-                                  color: Colors.redAccent, fontSize: 30.0),
+                                  color: Colors.blue, fontSize: 35.0, fontWeight: FontWeight.bold),
                             ),
                           ),
                           SizedBox(
@@ -161,14 +164,14 @@ class _LoginState extends State<LoginPage> {
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w300,
+                                fontWeight: FontWeight.bold,
                               ),
                               decoration: InputDecoration(
                                   prefixIcon: Padding(
                                     padding:
                                     EdgeInsets.only(left: 20, right: 15),
                                     child:
-                                    Icon(Icons.person, color: Colors.black),
+                                    Icon(Icons.person, color: Colors.blue),
                                   ),
                                   contentPadding: EdgeInsets.all(18),
                                   labelText: "Email/ Username"),
@@ -188,14 +191,14 @@ class _LoginState extends State<LoginPage> {
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w300,
+                                fontWeight: FontWeight.bold,
                               ),
                               decoration: InputDecoration(
                                 labelText: "Password",
                                 prefixIcon: Padding(
                                   padding: EdgeInsets.only(left: 20, right: 15),
-                                  child: Icon(Icons.phonelink_lock,
-                                      color: Colors.black),
+                                  child: Icon(Icons.security,
+                                      color: Colors.blue),
                                 ),
                                 suffixIcon: IconButton(
                                   onPressed: showHide,
@@ -214,11 +217,11 @@ class _LoginState extends State<LoginPage> {
 
                           FlatButton(
                               child: Text(
-                                "create account",
+                                "new user? create account",
                                 style: TextStyle(fontSize: 18.0),
                               ),
-                              textColor: Colors.white,
-                              color: Color(0xFFf7d426),
+                              textColor: Colors.blue[800],
+                              color: Colors.white,
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -244,7 +247,7 @@ class _LoginState extends State<LoginPage> {
                                       style: TextStyle(fontSize: 18.0),
                                     ),
                                     textColor: Colors.white,
-                                    color: Color(0xFFf7d426),
+                                    color: Colors.blue[800],
                                     onPressed: () {
                                       check();
                                     }),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:alco_safe/routes.dart';
+import 'package:alco_safe/ui/routes.dart';
 
 void main() => runApp(MyApp());
 
