@@ -9,7 +9,9 @@ A simple profile page.
 
 Has a customized navbar (using help from one of the projects here in github: bottomnavybar)
 
-You need the php files attached to connect to a database.
+You need the php files from the php folder to connect to a database.
+Then create an images and users folder in the server side. (000webhost)
+And a database.
 
 SCREENSHOTS:
 
