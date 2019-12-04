@@ -1,16 +1,16 @@
 # alco_safe
 
-An app to test for fake alcohol
+A simple QR SCanner flutter app to test for fake alcohol.
 
-## Getting Started
+It has a login and registration page,
+A Tabbed layout that can scan qr or bar codes and compare them to those stored in a specified database (currently uses 000webhost. It's Free!!)
+A simple Cart implementation.
+A simple profile page.
 
-This project is a starting point for a Flutter application.
+Has a customized navbar (using help from one of the projects here in github: bottomnavybar)
 
-A few resources to get you started if this is your first Flutter project:
+You need the php files attached to connect to a database.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+SCREENSHOTS:
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
