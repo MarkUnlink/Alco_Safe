@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:alco_safe/vars/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:spring_button/spring_button.dart';
 import 'package:barcode_scan/barcode_scan.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 
 class Scan extends StatefulWidget {
+  const Scan({Key key}) : super(key: key);
   @override
   _ScanState createState() => _ScanState();
 }
@@ -38,10 +40,7 @@ Widget button(String text, Color color) {
 }
 
 // =============================================================================
-void addCart() {
 
-
-}
 
 class _ScanState extends State<Scan> {
 
@@ -129,6 +128,15 @@ class _ScanState extends State<Scan> {
 
     print(p);
     return p;
+  }
+
+  void addCart() {
+    Variable.items.add(name);
+    Variable.prices.add(price);
+    Variable.barcodes.add(result.toString());
+    Variable.total+= int.parse(price);
+    Variable.count++;
+
   }
 
 

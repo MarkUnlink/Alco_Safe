@@ -5,29 +5,12 @@ import 'package:alco_safe/scan.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Alco Safe',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Pages(title: 'alcoHome'),
-    );
-  }
+  _HomeState createState() => _HomeState();
 }
 
-class Pages extends StatefulWidget {
-  Pages({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _PageState createState() => _PageState();
-}
-
-class _PageState extends State<Pages> {
+class _HomeState extends State<Home> {
   BuildContext ctx;
 
   int currentIndex = 0;
@@ -42,37 +25,37 @@ class _PageState extends State<Pages> {
     });
   }
 
+  final List<Widget> pages = [
+    Scan(
+      key: PageStorageKey('Page1'),
+    ),
+    Cart(
+      key: PageStorageKey('Page2'),
+    ),
+    Profile(
+      key: PageStorageKey('Page1'),
+    ),
+  ];
+  final PageStorageBucket bucket = PageStorageBucket();
+
+
 
   @override
   Widget build(BuildContext context) {
     ctx = context;
     return Scaffold(
         backgroundColor: Colors.white,
-        body: Stack(
-          children: <Widget>[
-            Background(),
-            PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                pageChanged(index);
-              },
-              children: <Widget>[
-
-                Scan(),
-                Cart(),
-                Profile(),
-              ],
-            ),
-          ],
+        body: PageStorage(
+          child: pages[currentIndex],
+          bucket: bucket,
         ),
+
         bottomNavigationBar: BottomNavyBar(
           iconSize: 30,
           selectedIndex: currentIndex,
           showElevation: true,
           onItemSelected: (index) => setState(() {
             currentIndex = index;
-            _pageController.animateToPage(index,
-                duration: Duration(milliseconds: 300), curve: Curves.ease);
           }),
           items: [
             BottomNavyBarItem(

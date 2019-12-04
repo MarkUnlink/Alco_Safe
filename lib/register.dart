@@ -1,10 +1,11 @@
-import 'package:alco_safe/home.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 class Register extends StatefulWidget {
@@ -13,8 +14,18 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  String username, fname, sname, cardno, email, password;
+  String username, fname, sname, cardno, email, password, profilepic;
+  Future<File> imagePic;
+  File picture;
   final _keys = new GlobalKey<FormState>();
+  BuildContext rtx;
+
+  TextEditingController us = new TextEditingController();
+  TextEditingController fn = new TextEditingController();
+  TextEditingController sn = new TextEditingController();
+  TextEditingController car = new TextEditingController();
+  TextEditingController em = new TextEditingController();
+  TextEditingController pass = new TextEditingController();
 
   bool _secureText = true;
 
@@ -31,8 +42,46 @@ class _RegisterState extends State<Register> {
       save();
     }
   }
+// =============================================================================
+  pickImage(ImageSource source) {
+    setState(() {
+      imagePic = ImagePicker.pickImage(source: source);
+    });
+  }
 
-  save() async {
+  Widget showImage() {
+    return FutureBuilder<File>(
+      future: imagePic,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.data != null) {
+          profilepic = base64Encode(snapshot.data.readAsBytesSync());
+          return SizedBox (
+            width: 82,
+            height: 82,
+            child: Image.file(
+              snapshot.data,
+            ),
+          );
+        } else if (snapshot.error != null) {
+          return const Text(
+            'Error Picking Image',
+            textAlign: TextAlign.center,
+          );
+        } else {
+          return SizedBox (
+            width: 82,
+            height: 82,
+            child: Image.asset('assets/images/avatar.png',
+            ),
+          );
+        }
+      },
+    );
+  }
+
+// =============================================================================
+  Future<List> save() async {
     final response = await http
         .post("https://alcosafe.000webhostapp.com/register.php", body: {
       "username": username,
@@ -41,37 +90,25 @@ class _RegisterState extends State<Register> {
       "cardno": cardno,
       "email": email,
       "password": password,
+      "profilepic": profilepic,
     });
 
-    String data;
-    data = response.toString();
+    String message = response.body;
 
-    if (data == "account created") {
-      setState(() {
-        var value = 1;
-        savePref(value, username);
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Home()),
-        );
-      });
-      print(data);
-      registerToast(data);
+    if (response.body == 'account created') {
+      print(message);
+      registerToast(message);
+
+      Navigator.pop(rtx);
+      registerToast("now Log in please");
+      Navigator.of(rtx).pushReplacementNamed("/login");
+
     } else {
-      print(data);
-      registerToast(data);
+      print(message);
+      registerToast(message);
     }
   }
 
-  savePref(int value, String name) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    setState(() {
-      preferences.setInt("value", value);
-      preferences.setString("name", name);
-      preferences.commit();
-    });
-  }
 
   registerToast(String toast) {
     return Fluttertoast.showToast(
@@ -79,14 +116,15 @@ class _RegisterState extends State<Register> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIos: 1,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.blueAccent,
         textColor: Colors.white);
   }
 
   @override
   Widget build(BuildContext context) {
+    rtx = context;
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Center(
         child: ListView(
           shrinkWrap: true,
@@ -95,33 +133,74 @@ class _RegisterState extends State<Register> {
             Center(
               child: Container(
                 padding: const EdgeInsets.all(8.0),
-                color: Colors.black,
+                color: Colors.white,
                 child: Form(
                   key: _keys,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Image.asset('assets/images/qr-code.png',
-                        height: 190,
-                        width: 190,),
-                      SizedBox(
-                        height: 40,
-                      ),
                       SizedBox(
                         height: 50,
                         child: Text(
                           "create Account",
-                          style: TextStyle(color: Colors.white, fontSize: 30.0),
+                          style: TextStyle(color: Colors.blue[900], fontSize: 35.0, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Card(
+                        elevation: 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            showImage(),
+                            RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0)),
+                              child: Text("add profile picture"),
+                              textColor: Colors.blue[800],
+                              color: Colors.white,
+                              onPressed: () {
+                                pickImage(ImageSource.gallery);
+                              },
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(
                         height: 25,
                       ),
 
+                      // Card showing auto- generated username
+                      Card(
+                        elevation: 6.0,
+                        child: TextFormField(
+                          controller: us,
+                          validator: (e) {
+                            if (e.isEmpty) {
+                              return "username ";
+                            }
+                          },
+                          onSaved: (e) => username = e,
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          decoration: InputDecoration(
+                              prefixIcon: Padding(
+                                padding: EdgeInsets.only(left: 20, right: 15),
+                                child: Icon(Icons.all_inclusive, color: Colors.blue),
+                              ),
+                              contentPadding: EdgeInsets.all(18),
+                              labelText: "username"),
+                        ),
+                      ),
+
                       //card for First name TextFormField
                       Card(
                         elevation: 6.0,
                         child: TextFormField(
+                          controller: fn,
                           validator: (e) {
                             if (e.isEmpty) {
                               return "first name ";
@@ -131,12 +210,12 @@ class _RegisterState extends State<Register> {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
-                            fontWeight: FontWeight.w300,
+                            fontWeight: FontWeight.w400,
                           ),
                           decoration: InputDecoration(
                               prefixIcon: Padding(
                                 padding: EdgeInsets.only(left: 20, right: 15),
-                                child: Icon(Icons.person, color: Colors.black),
+                                child: Icon(Icons.blur_on, color: Colors.blue),
                               ),
                               contentPadding: EdgeInsets.all(18),
                               labelText: "fname"),
@@ -147,6 +226,7 @@ class _RegisterState extends State<Register> {
                       Card(
                         elevation: 6.0,
                         child: TextFormField(
+                          controller: sn,
                           validator: (e) {
                             if (e.isEmpty) {
                               return "surname";
@@ -156,12 +236,12 @@ class _RegisterState extends State<Register> {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
-                            fontWeight: FontWeight.w300,
+                            fontWeight: FontWeight.w400,
                           ),
                           decoration: InputDecoration(
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(left: 20, right: 15),
-                              child: Icon(Icons.phone, color: Colors.black),
+                              child: Icon(Icons.blur_on, color: Colors.blue),
                             ),
                             contentPadding: EdgeInsets.all(18),
                             labelText: "sname",
@@ -173,6 +253,7 @@ class _RegisterState extends State<Register> {
                       Card(
                         elevation: 6.0,
                         child: TextFormField(
+                          controller: car,
                           validator: (e) {
                             if (e.isEmpty) {
                               return "Debit/ Credit card number";
@@ -182,12 +263,12 @@ class _RegisterState extends State<Register> {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
-                            fontWeight: FontWeight.w300,
+                            fontWeight: FontWeight.w400,
                           ),
                           decoration: InputDecoration(
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(left: 20, right: 15),
-                              child: Icon(Icons.phone, color: Colors.black),
+                              child: Icon(Icons.view_week, color: Colors.blue),
                             ),
                             contentPadding: EdgeInsets.all(18),
                             labelText: "cardno",
@@ -200,6 +281,7 @@ class _RegisterState extends State<Register> {
                       Card(
                         elevation: 6.0,
                         child: TextFormField(
+                          controller: em,
                           validator: (e) {
                             if (e.isEmpty) {
                               return "email address ";
@@ -214,7 +296,7 @@ class _RegisterState extends State<Register> {
                           decoration: InputDecoration(
                               prefixIcon: Padding(
                                 padding: EdgeInsets.only(left: 20, right: 15),
-                                child: Icon(Icons.email, color: Colors.black),
+                                child: Icon(Icons.email, color: Colors.blue),
                               ),
                               contentPadding: EdgeInsets.all(18),
                               labelText: "email"),
@@ -225,6 +307,7 @@ class _RegisterState extends State<Register> {
                       Card(
                         elevation: 6.0,
                         child: TextFormField(
+                          controller: pass,
                           obscureText: _secureText,
                           onSaved: (e) => password = e,
                           style: TextStyle(
@@ -241,8 +324,8 @@ class _RegisterState extends State<Register> {
                               ),
                               prefixIcon: Padding(
                                 padding: EdgeInsets.only(left: 20, right: 15),
-                                child: Icon(Icons.phonelink_lock,
-                                    color: Colors.black),
+                                child: Icon(Icons.vpn_key,
+                                    color: Colors.blue),
                               ),
                               contentPadding: EdgeInsets.all(18),
                               labelText: "Password"),
@@ -266,7 +349,7 @@ class _RegisterState extends State<Register> {
                                   style: TextStyle(fontSize: 18.0),
                                 ),
                                 textColor: Colors.white,
-                                color: Color(0xFFf7d426),
+                                color: Colors.blue[900],
                                 onPressed: () {
                                   check();
                                 }),
@@ -280,8 +363,8 @@ class _RegisterState extends State<Register> {
                                   "Login",
                                   style: TextStyle(fontSize: 18.0),
                                 ),
-                                textColor: Colors.white,
-                                color: Color(0xFFf7d426),
+                                textColor: Colors.blueGrey,
+                                color: Colors.white,
                                 onPressed: () {
                                   Navigator.pop(context);
                                 }),

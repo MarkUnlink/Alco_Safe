@@ -19,6 +19,7 @@ class _LoginState extends State<LoginPage> {
   final _key = new GlobalKey<FormState>();
   BuildContext ctx;
 
+
   TextEditingController email = new TextEditingController();
   TextEditingController pass = new TextEditingController();
 
@@ -48,7 +49,7 @@ class _LoginState extends State<LoginPage> {
     });
 
     String message = response.body;
-    String username = email.toString();
+    String username = email.text.toString();
     //String message = response.toString();
 
     if (response.body == 'success') {
@@ -58,6 +59,7 @@ class _LoginState extends State<LoginPage> {
       });
 
       print(message);
+      print(username);
       loginToast(message);
       savePref(value, username);
       Navigator.of(ctx).pushReplacementNamed("/home");
@@ -79,11 +81,11 @@ class _LoginState extends State<LoginPage> {
   }
 
   savePref(int value, String name) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      preferences.setInt("value", value);
-      preferences.setString("name", name);
-      preferences.commit();
+      prefs.setInt("value", value);
+      prefs.setString("name", name);
+      prefs.commit();
     });
   }
 
