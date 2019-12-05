@@ -1,5 +1,3 @@
-import 'package:alco_safe/ui/background.dart';
-import 'package:alco_safe/cart.dart';
 import 'package:alco_safe/profile.dart';
 import 'package:alco_safe/scan.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
@@ -29,15 +27,11 @@ class _HomeState extends State<Home> {
     Scan(
       key: PageStorageKey('Page1'),
     ),
-    Cart(
-      key: PageStorageKey('Page2'),
-    ),
     Profile(
-      key: PageStorageKey('Page1'),
+      key: PageStorageKey('Page2'),
     ),
   ];
   final PageStorageBucket bucket = PageStorageBucket();
-
 
 
   @override
@@ -62,12 +56,6 @@ class _HomeState extends State<Home> {
               icon: Icon(Icons.camera_enhance),
               title: Text('Scan'),
               activeColor: Colors.red,
-              inactiveColor: Colors.blueGrey,
-            ),
-            BottomNavyBarItem(
-              icon: Icon(Icons.account_balance_wallet),
-              title: Text('Cart'),
-              activeColor: Colors.green,
               inactiveColor: Colors.blueGrey,
             ),
             BottomNavyBarItem(
