@@ -17,8 +17,7 @@ Then create an images and users folder in the server side. (000webhost)
 And a database.
 
 <strong>SCREENSHOTS:</strong>
-
-![login](https://github.com/MarkUnlink/Alco_Safe/tree/master/SCREENSHOTS/login.jpg)
+For screenshots, check out the SCREENSHOTS folder.
 
 
 
